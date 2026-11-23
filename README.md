@@ -3,6 +3,13 @@
 An end-to-end Natural Language Processing system for multi-turn dialogue sentiment classification, 7-class emotion recognition, conversational context modeling, and Generative AI conversational intelligence, benchmarked on the **MELD (Multimodal EmotionLines Dataset)**.
 
 ---
+## 🌐 Live Demo
+
+🚀 **Try the application:** [Conversation Sentiment Analysis](https://conversation-sentiment-analysis-ptttpxpcfrnefjuexssmrs.streamlit.app/)
+
+📂 **GitHub Repository:** [View Source Code](https://github.com/Sanskarmeharkar/Conversation-Sentiment-Analysis)
+
+🤗 **Hugging Face Models:** [View Trained Models](https://huggingface.co/Sanskarmeharkar/conversation-sentiment-models)
 
 ## 📌 Project Overview
 
@@ -44,7 +51,7 @@ flowchart TD
         I --> J[Speaker Emotional Profiles & Trajectory]
         I --> K[TF-IDF Keywords & spaCy Named Entity Recognition]
         I --> L[NMF Topic Modeling]
-        I --> M[Groq Llama-3.3 GenAI Synthesis<br/>Executive Summary & Recommendations]
+        I --> M[Groq GPT-OSS 20B GenAI Synthesis<br/>Executive Summary & Recommendations]
     end
 
     subgraph Interface
