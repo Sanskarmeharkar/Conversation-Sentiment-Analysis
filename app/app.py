@@ -304,7 +304,11 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ---------------- MODEL PATHS & REGISTRY ----------------
-CLASSICAL_MODEL_PATH = PROJECT_ROOT / "models" / "classical" / "classical_models.joblib"
+
+HF_MODEL_REPO = "Sanskarmeharkar/conversation-sentiment-models"
+
+CLASSICAL_MODEL_FILE = "classical/classical_models.joblib"
+
 MODEL_OPTIONS = {
     "Context-Aware DistilBERT (Recommended)": "context_distilbert",
     "DistilBERT (Utterance Only)": "distilbert",
@@ -313,12 +317,14 @@ MODEL_OPTIONS = {
     "Linear SVM (TF-IDF Baseline)": "linear_svm",
     "Naive Bayes (TF-IDF Baseline)": "naive_bayes",
 }
+
 TRANSFORMER_PATHS = {
-    "distilbert": PROJECT_ROOT / "models" / "distilbert_meld_sentiment",
-    "context_distilbert": PROJECT_ROOT / "models" / "distilbert_meld_context",
-    "roberta": PROJECT_ROOT / "models" / "roberta_meld_sentiment",
+    "distilbert": "distilbert_meld_sentiment",
+    "context_distilbert": "distilbert_meld_context",
+    "roberta": "roberta_meld_sentiment",
 }
-EMOTION_MODEL_PATH = PROJECT_ROOT / "models" / "distilbert_meld_emotion"
+
+EMOTION_MODEL_PATH = "distilbert_meld_emotion"
 
 EMOTION_EMOJIS = {
     "anger": "😡 Anger",
@@ -330,38 +336,73 @@ EMOTION_EMOJIS = {
     "surprise": "😲 Surprise"
 }
 
+## ---------------- CACHED MODEL LOADERS ----------------
+
 # ---------------- CACHED MODEL LOADERS ----------------
+
 @st.cache_resource
 def load_classical_models():
-    if not CLASSICAL_MODEL_PATH.exists():
-        raise FileNotFoundError(f"Classical model artifact missing: {CLASSICAL_MODEL_PATH}")
-    return joblib.load(CLASSICAL_MODEL_PATH)
+    model_file = hf_hub_download(
+        repo_id=HF_MODEL_REPO,
+        filename=CLASSICAL_MODEL_FILE
+    )
+    return joblib.load(model_file)
 
 
 @st.cache_resource
 def load_transformer_model(model_key, use_gpu=False):
-    model_path = TRANSFORMER_PATHS.get(model_key)
-    if model_path is None or not model_path.exists():
-        raise FileNotFoundError(f"Model checkpoint directory not found: {model_path}")
-    tokenizer = AutoTokenizer.from_pretrained(str(model_path))
-    model = AutoModelForSequenceClassification.from_pretrained(str(model_path))
-    device = torch.device("cuda" if use_gpu and torch.cuda.is_available() else "cpu")
+    model_folder = TRANSFORMER_PATHS.get(model_key)
+
+    if model_folder is None:
+        raise ValueError(f"Unknown transformer model: {model_key}")
+
+    from huggingface_hub import snapshot_download
+
+    downloaded_repo = snapshot_download(
+        repo_id=HF_MODEL_REPO,
+        allow_patterns=f"{model_folder}/*"
+    )
+
+    local_model_path = Path(downloaded_repo) / model_folder
+
+    tokenizer = AutoTokenizer.from_pretrained(str(local_model_path))
+    model = AutoModelForSequenceClassification.from_pretrained(
+        str(local_model_path)
+    )
+
+    device = torch.device(
+        "cuda" if use_gpu and torch.cuda.is_available() else "cpu"
+    )
+
     model.to(device)
     model.eval()
+
     return tokenizer, model, device
 
 
 @st.cache_resource
 def load_emotion_model():
-    if not EMOTION_MODEL_PATH.exists():
-        raise FileNotFoundError(f"Emotion model checkpoint missing: {EMOTION_MODEL_PATH}")
-    tokenizer = AutoTokenizer.from_pretrained(str(EMOTION_MODEL_PATH))
-    model = AutoModelForSequenceClassification.from_pretrained(str(EMOTION_MODEL_PATH))
+    from huggingface_hub import snapshot_download
+
+    downloaded_repo = snapshot_download(
+        repo_id=HF_MODEL_REPO,
+        allow_patterns=f"{EMOTION_MODEL_PATH}/*"
+    )
+
+    local_model_path = Path(downloaded_repo) / EMOTION_MODEL_PATH
+
+    tokenizer = AutoTokenizer.from_pretrained(str(local_model_path))
+    model = AutoModelForSequenceClassification.from_pretrained(
+        str(local_model_path)
+    )
+
+    # Emotion model runs on CPU
     device = torch.device("cpu")
+
     model.to(device)
     model.eval()
-    return tokenizer, model, device
 
+    return tokenizer, model, device
 
 # ---------------- PRESET CONVERSATIONS FOR DEMO ----------------
 DEMO_PRESETS = {
