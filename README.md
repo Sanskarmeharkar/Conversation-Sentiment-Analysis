@@ -141,10 +141,3 @@ cd Conversation_Sentiment_Analysis
 streamlit run app/app.py
 ```
 
-### 3. Recommended Viva / Demo Flow (10 Minutes)
-1. **Choose a Preset:** Select `Preset 2: Project Deadline Escalation (Conflict Resolution)` from the dropdown.
-2. **Click "Analyze Conversation":** Show turn-by-turn sentiment and emotion predictions alongside real-time inference latency (ms).
-3. **Show Speaker Profiles & Trajectory:** Highlight how Alex and Jordan's sentiment scores transition from negative (conflict) to positive (resolution).
-4. **Inspect the NLP Pipeline (Sidebar):** Walk through Turn 1 in the sidebar expander: Raw Utterance $\to$ Cleaned Text $\to$ Tokenization $\to$ Stopwords $\to$ Lemmatization $\to$ Transformer Context String.
-5. **Demonstrate Context-Aware DistilBERT:** Switch model to `Context-Aware DistilBERT` to show how preceding turns resolve ambiguous phrases.
-6. **Trigger GenAI Synthesis:** Click *"Generate Summary"* and *"Explain Dynamics"* to show executive-level insights.
