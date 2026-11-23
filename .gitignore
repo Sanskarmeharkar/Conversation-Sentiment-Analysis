@@ -1,0 +1,42 @@
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Virtual environments
+venv/
+.venv/
+env/
+
+# Secrets - NEVER upload API keys
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+**/.streamlit/secrets.toml
+
+# Datasets
+data/
+
+# Trained models - uploaded separately to Hugging Face
+models/
+*.pt
+*.pth
+*.bin
+*.safetensors
+
+# Generated results
+results/
+logs/
+
+# Temporary files
+*.tmp
+*.log
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# OS files
+.DS_Store
+Thumbs.db
