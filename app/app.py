@@ -298,7 +298,7 @@ st.markdown("""
         <span class="hero-pill">🎭 7-Class Emotion Model</span>
         <span class="hero-pill">📊 MELD Benchmark</span>
         <span class="hero-pill">🔍 TF-IDF & spaCy NER</span>
-        <span class="hero-pill">🤖 Groq Llama-3.3 GenAI</span>
+        <span class="hero-pill">🤖 openai/gpt-oss-20b GenAI</span>
     </div>
 </div>
 """, unsafe_allow_html=True)
@@ -470,7 +470,7 @@ st.sidebar.caption(
     "• **Emotion Recognition:** 7-Class MELD model\n"
     "• **NLP Inspection:** Tokenization, stopword filter, lemmatization\n"
     "• **Entity & Topic Modeling:** spaCy NER & NMF Topic extraction\n"
-    "• **Generative AI:** Groq Llama-3.3 conversation intelligence"
+    "• **Generative AI:** openai/gpt-oss-20b conversation intelligence"
 )
 
 # ---------------- INPUT SECTION ----------------
@@ -755,7 +755,7 @@ if st.session_state.get("analyzed", False):
     if not LLM_AVAILABLE:
         st.warning(f"LLM Service offline: {LLM_IMPORT_ERROR}")
     else:
-        st.caption("Generates executive summaries, emotional root-cause explanations, and communication recommendations via Groq Llama-3.3.")
+        st.caption("Generates executive summaries, emotional root-cause explanations, and communication recommendations via openai/gpt-oss-20b.")
         g1, g2, g3 = st.columns(3)
 
         if g1.button("📄 Generate Summary", key="btn_summary"):
@@ -792,40 +792,7 @@ if st.session_state.get("analyzed", False):
             st.markdown("**AI Response:**")
             st.markdown(st.session_state["llm_chat_answer"])
 
-    # ---------------- BENCHMARK & MODEL PERFORMANCE ----------------
-    st.divider()
-    st.header("6. Model Benchmark Comparison (MELD Dataset)")
-
-    benchmark_csv = PROJECT_ROOT / "results" / "metrics" / "model_comparison.csv"
-    if benchmark_csv.exists():
-        model_results = pd.read_csv(benchmark_csv)
-    else:
-        model_results = pd.DataFrame([
-            {"Model": "Naive Bayes (TF-IDF)", "Type": "Classical", "Accuracy (%)": 51.13, "Macro F1 (%)": 41.00, "Weighted F1 (%)": 45.00},
-            {"Model": "Logistic Regression (TF-IDF)", "Type": "Classical", "Accuracy (%)": 51.22, "Macro F1 (%)": 49.24, "Weighted F1 (%)": 51.00},
-            {"Model": "Linear SVM (TF-IDF)", "Type": "Classical", "Accuracy (%)": 48.69, "Macro F1 (%)": 46.00, "Weighted F1 (%)": 48.00},
-            {"Model": "DistilBERT", "Type": "Transformer", "Accuracy (%)": 67.99, "Macro F1 (%)": 65.45, "Weighted F1 (%)": 67.55},
-            {"Model": "Context DistilBERT", "Type": "Context-Aware Transformer", "Accuracy (%)": 68.71, "Macro F1 (%)": 66.94, "Weighted F1 (%)": 68.32},
-            {"Model": "RoBERTa", "Type": "Transformer", "Accuracy (%)": 68.89, "Macro F1 (%)": 66.91, "Weighted F1 (%)": 68.70},
-        ])
-
-    b1, b2 = st.columns(2)
-    best_acc = model_results.loc[model_results["Accuracy (%)"].idxmax()]
-    best_f1 = model_results.loc[model_results["Macro F1 (%)"].idxmax()]
-    b1.metric("Highest Test Accuracy", f"{best_acc['Accuracy (%)']:.2f}%", best_acc["Model"])
-    b2.metric("Highest Macro F1", f"{best_f1['Macro F1 (%)']:.2f}%", best_f1["Model"])
-
-    st.dataframe(model_results, use_container_width=True, hide_index=True)
-
-    c_plot1, c_plot2 = st.columns(2)
-    with c_plot1:
-        st.subheader("Accuracy Comparison")
-        st.bar_chart(model_results.set_index("Model")["Accuracy (%)"])
-    with c_plot2:
-        st.subheader("Macro F1 vs Weighted F1")
-        st.bar_chart(model_results.set_index("Model")[["Macro F1 (%)", "Weighted F1 (%)"]])
-
-    st.caption("Evaluated on 2,610 MELD test utterances. Context DistilBERT integrates sliding dialogue history via [SEP] tokenization.")
+   
 
 # ---------------- NLP PROCESSING PIPELINE SIDEBAR INSPECTOR ----------------
 if "messages" in locals() and messages:
